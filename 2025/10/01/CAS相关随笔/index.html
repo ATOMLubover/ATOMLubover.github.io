@@ -23,19 +23,19 @@
   
     <meta name="description" content="atomic::Ordering 相关汇编层面的执行顺序x86 CPU 的执行流程 先按程序顺序抽取指令，并编码为微指令 将指令中的逻辑寄存器分配为真正的物理寄存器，这过程确定了真正的 data dependency（表现为寄存器依赖） 记录进 ROB （entry 记录为 uncompleted）记录了原始顺序，可以开始允许乱序执行 发送各种类型的指令到各个 RS（比如加法操作 RS、读取 RS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CAS相关随笔">
+<meta property="og:title" content="CAS 相关随笔">
 <meta property="og:url" content="http://example.com/2025/10/01/CAS%E7%9B%B8%E5%85%B3%E9%9A%8F%E7%AC%94/index.html">
 <meta property="og:site_name" content="Hatsu1ki Blog">
 <meta property="og:description" content="atomic::Ordering 相关汇编层面的执行顺序x86 CPU 的执行流程 先按程序顺序抽取指令，并编码为微指令 将指令中的逻辑寄存器分配为真正的物理寄存器，这过程确定了真正的 data dependency（表现为寄存器依赖） 记录进 ROB （entry 记录为 uncompleted）记录了原始顺序，可以开始允许乱序执行 发送各种类型的指令到各个 RS（比如加法操作 RS、读取 RS">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-10-01T12:04:55.000Z">
-<meta property="article:modified_time" content="2025-10-01T13:41:59.991Z">
+<meta property="article:modified_time" content="2025-10-05T11:24:39.593Z">
 <meta property="article:author" content="Hatsu1ki-LB">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>CAS相关随笔 - Hatsu1ki Blog</title>
+  <title>CAS 相关随笔 - Hatsu1ki Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -201,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CAS相关随笔"></span>
+            <span id="subtitle" data-typed-text="CAS 相关随笔"></span>
           
         </div>
 
@@ -224,7 +224,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.1k 字
+          995 字
         
       </span>
     
@@ -235,7 +235,7 @@
         
         
         
-          10 分钟
+          9 分钟
         
       </span>
     
@@ -272,7 +272,7 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">CAS相关随笔</h1>
+            <h1 id="seo-header">CAS 相关随笔</h1>
             
             
               <div class="markdown-body">
@@ -354,8 +354,6 @@
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">// thread A</span><br>x.<span class="hljs-title function_ invoke__">store</span>(<span class="hljs-number">1</span>, SeqCst);<br><span class="hljs-keyword">let</span> <span class="hljs-variable">rv</span> = y.<span class="hljs-title function_ invoke__">load</span>(SeqCst);<br><br><span class="hljs-comment">// thread B</span><br>y.<span class="hljs-title function_ invoke__">store</span>(<span class="hljs-number">1</span>, SeqCst);<br><span class="hljs-keyword">let</span> <span class="hljs-variable">rv</span> = x.<span class="hljs-title function_ invoke__">load</span>(SeqCst);<br></code></pre></td></tr></table></figure>
 
 <p>我们在特定情况下，必须使用 SeqCst，防止 store 的延迟写入导致 thread A 和 B 在 load 之后读才触发 store 的写入（load 这种非 RMW 操作不会在非 SeqCst 情况下强制触发刷新 SB）。</p>
-<h3 id="乱序执行（Out-of-Order-execution）"><a href="#乱序执行（Out-of-Order-execution）" class="headerlink" title="乱序执行（Out-of-Order execution）"></a>乱序执行（Out-of-Order execution）</h3><p>这就是经典计组中流水线 CPU 执行指令时发生的操作，CPU 在对从缓存加载到保留站（reservation station）的指令进行 <strong>数据依赖（data dependency）检查</strong>，如果某些指令不依赖前面的指令的结果，那么它就可能会被 CPU 先选择执行。</p>
-<p>乱序执行本身是安全的，他是在不改变单线程执行结果的前提下进行的乱序执行。</p>
 
                 
               </div>
@@ -373,7 +371,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CAS相关随笔</div>
+      <div>CAS 相关随笔</div>
       <div>http://example.com/2025/10/01/CAS相关随笔/</div>
     </div>
     <div class="license-meta">
@@ -422,8 +420,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/10/01/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0%EF%BC%88%E6%95%B0%E7%BB%84%EF%BC%89/" title="算法笔记（数组）">
-                        <span class="hidden-mobile">算法笔记（数组）</span>
+                      <a href="/2025/09/27/%E6%97%A5%E8%AF%AD%E8%87%AA%E5%AD%A6%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B%EF%BC%9A%E7%AC%AC%E4%B8%80%E5%8D%95%E5%85%83%EF%BC%882%EF%BC%89/" title="日语自学基础教程：第一单元（2）">
+                        <span class="hidden-mobile">日语自学基础教程：第一单元（2）</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
