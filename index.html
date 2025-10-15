@@ -229,6 +229,94 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/10/15/%E5%85%B3%E4%BA%8E-channel-messages-%E5%88%97%E8%A1%A8%E7%9A%84%E7%BC%93%E5%AD%98%E6%93%8D%E4%BD%9C%E4%BC%98%E5%8C%96/" target="_self">
+          关于 channel:messages 列表的缓存操作优化
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/10/15/%E5%85%B3%E4%BA%8E-channel-messages-%E5%88%97%E8%A1%A8%E7%9A%84%E7%BC%93%E5%AD%98%E6%93%8D%E4%BD%9C%E4%BC%98%E5%8C%96/" target="_self">
+        <div>
+          缓存失效的几种情况 内存淘汰：由于内存占用过大，自动淘汰。 超时淘汰：由于 key 达到了 expiration 时间点，自动淘汰。 “数据库” 数据更新：value 与数据库值不一致。  缓存失效时可采用的主动操作 Cache aside：业务层先修改数据库，后修改缓存。 RW through：业务层均读写于缓存，缓存层自动同步数据库。 Write behind：业务层均读写于缓存，随后由缓存层
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-10-15 16:47" pubdate>
+              2025-10-15
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E5%90%8E%E7%AB%AF/">#后端</a>
+            
+              <a href="/tags/%E5%A4%87%E5%BF%98/">#备忘</a>
+            
+              <a href="/tags/%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7/">#缓存一致性</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/10/15/%E4%B8%80%E7%A7%8D%E9%92%88%E5%AF%B9%E5%88%86%E5%B8%83%E5%BC%8F-Chat-Server-%E6%A8%AA%E5%90%91%E6%89%A9%E5%B1%95%E7%9A%84%E5%8F%AF%E8%83%BD%E6%80%9D%E8%B7%AF/" target="_self">
+          一种针对分布式 Chat Server 横向扩展的可能思路
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/10/15/%E4%B8%80%E7%A7%8D%E9%92%88%E5%AF%B9%E5%88%86%E5%B8%83%E5%BC%8F-Chat-Server-%E6%A8%AA%E5%90%91%E6%89%A9%E5%B1%95%E7%9A%84%E5%8F%AF%E8%83%BD%E6%80%9D%E8%B7%AF/" target="_self">
+        <div>
+          横向扩展出发点在可以横向简单扩展的架构中，最重要的是将 session state 从要扩展的服务器中摘除，或者至少公开到可以快速查询的基建服务上，比如 Redis 节点上。在此基础上，才可以允许 user 无论被负载均衡到哪一个实例上，都是等价的。
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-10-15 10:50" pubdate>
+              2025-10-15
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E5%90%8E%E7%AB%AF/">#后端</a>
+            
+              <a href="/tags/%E5%A4%87%E5%BF%98/">#备忘</a>
+            
+              <a href="/tags/%E6%B0%B4%E5%B9%B3%E6%89%A9%E5%B1%95/">#水平扩展</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/10/13/%E6%97%A5%E8%AF%AD%E8%87%AA%E5%AD%A6%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B%EF%BC%9A%E7%AC%AC%E4%B8%80%E5%8D%95%E5%85%83%EF%BC%883%EF%BC%89/" target="_self">
           日语自学基础教程：第一单元（3）
         </a>
@@ -237,7 +325,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/13/%E6%97%A5%E8%AF%AD%E8%87%AA%E5%AD%A6%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B%EF%BC%9A%E7%AC%AC%E4%B8%80%E5%8D%95%E5%85%83%EF%BC%883%EF%BC%89/" target="_self">
         <div>
-          图例这是专有名词 这是一份强调 这个一份超大杯级别强调 这是一段注释！可以忽视我，但是理解我更好  这是一段补充哦~如果理解不了，可以等待学习深入后再来回头看   一、预览内容这一节课我们将要着重来讲助词 ni 的用法。它作用一个表达 “抽象点” 的助词，在非常多的句式中都有使用。并且，在未来学习各种连用文节（也即状语文节）时，它也会时常出现。 以及我们会简单说说主格助词 ga 以及并列格助词
+          图例这是专有名词 这是一份强调 这个一份超大杯级别强调 这是一段注释！可以忽视我，但是理解我更好  这是一段补充哦~如果理解不了，可以等待学习深入后再来回头看   一、预览内容这一节课，最重要的内容是理解和存在句式相关的内容。其中的关键动词 あります 和 います，将在未来的其他句式中再来袭击我们（不是）。 此外，从存在句式开始延展，我们也将初步说明助词 に 的用法。它作用一个表达 “抽象点”
         </div>
       </a>
 
@@ -251,6 +339,15 @@
           </div>
         
         
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%97%A5%E8%AF%AD/">#日语</a>
+            
+              <a href="/tags/%E5%AD%A6%E4%B9%A0/">#学习</a>
+            
+          </div>
         
       </div>
     </article>
@@ -318,6 +415,15 @@
         
         
         
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E5%A4%87%E5%BF%98/">#备忘</a>
+            
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E7%BA%A7/">#系统级</a>
+            
+          </div>
+        
       </div>
     </article>
   </div>
@@ -351,6 +457,15 @@
         
         
         
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%97%A5%E8%AF%AD/">#日语</a>
+            
+              <a href="/tags/%E5%AD%A6%E4%B9%A0/">#学习</a>
+            
+          </div>
+        
       </div>
     </article>
   </div>
@@ -383,6 +498,15 @@
           </div>
         
         
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%97%A5%E8%AF%AD/">#日语</a>
+            
+              <a href="/tags/%E5%AD%A6%E4%B9%A0/">#学习</a>
+            
+          </div>
         
       </div>
     </article>
