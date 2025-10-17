@@ -229,6 +229,48 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/10/17/Go-%E7%9A%84-GMP-%E8%B0%83%E5%BA%A6%E6%A8%A1%E5%9E%8B%E6%B5%85%E6%9E%90/" target="_self">
+          Go 的 GMP 调度模型浅析
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/10/17/Go-%E7%9A%84-GMP-%E8%B0%83%E5%BA%A6%E6%A8%A1%E5%9E%8B%E6%B5%85%E6%9E%90/" target="_self">
+        <div>
+          什么是异步简单来说，异步就是会导致上下文不一致的函数运行环境。 因此，为了保证运行流程上的线性化，产生了将必要上下文保存在 coroutine stack 中的有栈协程模式和保存在 heap task object 中的无栈协程。 Go 的 GMP 模型G：Goroutine，协程P：Processor，逻辑处理器M: Machine，OS 线程 实际上，应该解释成下述这样： G：一个可执行的闭包
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-10-17 16:35" pubdate>
+              2025-10-17
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/">#编程语言</a>
+            
+              <a href="/tags/%E5%BC%82%E6%AD%A5%E8%B0%83%E5%BA%A6/">#异步调度</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/10/15/%E5%85%B3%E4%BA%8E-channel-messages-%E5%88%97%E8%A1%A8%E7%9A%84%E7%BC%93%E5%AD%98%E6%93%8D%E4%BD%9C%E4%BC%98%E5%8C%96/" target="_self">
           关于 channel:messages 列表的缓存操作优化
         </a>
@@ -237,7 +279,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/15/%E5%85%B3%E4%BA%8E-channel-messages-%E5%88%97%E8%A1%A8%E7%9A%84%E7%BC%93%E5%AD%98%E6%93%8D%E4%BD%9C%E4%BC%98%E5%8C%96/" target="_self">
         <div>
-          缓存失效的几种情况 内存淘汰：由于内存占用过大，自动淘汰。 超时淘汰：由于 key 达到了 expiration 时间点，自动淘汰。 “数据库” 数据更新：value 与数据库值不一致。  缓存失效时可采用的主动操作 Cache aside：业务层先修改数据库，后修改缓存。 RW through：业务层均读写于缓存，缓存层自动同步数据库。 Write behind：业务层均读写于缓存，随后由缓存层
+          一、缓存失效的原因 内存淘汰：由于内存占用过大，自动淘汰。 超时淘汰：由于 key 达到了 TTL 时间点，自动淘汰。 DB 数据更新：cache 与 DB 值不一致。  二、缓存重建时可采用的方案 Cache Aside：业务层先修改数据库，后顺手修改缓存。 Write Through：业务层均读写于缓存，缓存层自动同步数据库。 Write-behind：业务层均读写于缓存，随后由缓存层异步修改
         </div>
       </a>
 
@@ -281,7 +323,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/15/%E4%B8%80%E7%A7%8D%E9%92%88%E5%AF%B9%E5%88%86%E5%B8%83%E5%BC%8F-Chat-Server-%E6%A8%AA%E5%90%91%E6%89%A9%E5%B1%95%E7%9A%84%E5%8F%AF%E8%83%BD%E6%80%9D%E8%B7%AF/" target="_self">
         <div>
-          横向扩展出发点在可以横向简单扩展的架构中，最重要的是将 session state 从要扩展的服务器中摘除，或者至少公开到可以快速查询的基建服务上，比如 Redis 节点上。在此基础上，才可以允许 user 无论被负载均衡到哪一个实例上，都是等价的。
+          水平扩展出发点在可以横向简单扩展的架构中，最重要的是将 state 从要扩展的服务器中摘除，或者至少公开到可以快速查询的基建服务上，比如 Redis 节点上。在此基础上，才可以允许 user 无论被负载均衡到哪一个实例上，都是等价的。 所以我的设想是，尽量将 state 转存到用户、Redis 外部节点上，让有需要的业务服务器自行查询指定 state。这样，所有的服务器就可以是无状态的，只需要向注
         </div>
       </a>
 
@@ -420,7 +462,7 @@
             
               <a href="/tags/%E5%A4%87%E5%BF%98/">#备忘</a>
             
-              <a href="/tags/%E7%B3%BB%E7%BB%9F%E7%BA%A7/">#系统级</a>
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
             
           </div>
         

@@ -4,11 +4,32 @@
   
   
   <entry>
+    <title>Go 的 GMP 调度模型浅析</title>
+    <link href="/2025/10/17/Go-%E7%9A%84-GMP-%E8%B0%83%E5%BA%A6%E6%A8%A1%E5%9E%8B%E6%B5%85%E6%9E%90/"/>
+    <url>/2025/10/17/Go-%E7%9A%84-GMP-%E8%B0%83%E5%BA%A6%E6%A8%A1%E5%9E%8B%E6%B5%85%E6%9E%90/</url>
+    
+    <content type="html"><![CDATA[<h2 id="什么是异步"><a href="#什么是异步" class="headerlink" title="什么是异步"></a>什么是异步</h2><p>简单来说，异步就是会导致上下文不一致的函数运行环境。</p><p>因此，为了保证运行流程上的线性化，产生了将必要上下文保存在 coroutine stack 中的有栈协程模式和保存在 heap task object 中的无栈协程。</p><h2 id="Go-的-GMP-模型"><a href="#Go-的-GMP-模型" class="headerlink" title="Go 的 GMP 模型"></a>Go 的 GMP 模型</h2><p>G：Goroutine，协程<br>P：Processor，逻辑处理器<br>M: Machine，OS 线程</p><p>实际上，应该解释成下述这样：</p><p>G：一个可执行的闭包，其存储变量于协程栈上<br>P：一个存储 G 的队列，以及一些必要的上下文<br>M：实际的执行器，可以 run 被分配的函数</p><p>发生调度的实质是，M 中运行的 schedule 函数，暂停或结束当前 G 的执行，从 P 队列中取出一个新的 G，随后开始执行这个新的 G。</p><p>就好像 M 是一个吃货，它从 P 中倒豆子吃，隔一段时间取一个新的 P 吃。具有真正的主观能动性的都是 M，它才是执行函数的载体，或者说函数都是在 M 上跑的，如果 M 挂起那么程序就永远卡死了。</p><h3 id="G、M-与-P-之间的关系"><a href="#G、M-与-P-之间的关系" class="headerlink" title="G、M 与 P 之间的关系"></a>G、M 与 P 之间的关系</h3><p>实际上存在如下两个全局队列（不定长）：</p><p>① 全局就绪 G 队列（没有人执行的 G 构成）<br>② 全局空闲 M 队列（没有 P，因而没有 G 执行的 M 构成）<br><code>③ 全局空闲 P 队列（没有被 M 认领的 P 构成）</code></p><blockquote><p>之所以没有 P 队列，是因为 P 的数量是确定，由参数 GOMAXPROCS 指定，默认与物理核心数一样。另外，M 的初始数量也是物理核心数。</p></blockquote><p>任何 G 想要被运行，都必须先被一个 P 认领（进入 P 的本地 G 队列），随后再被认领了这个 P 的 M 选出来执行。</p><p>全局就绪 G 队列被推入的时机：某个 G 中使用 go func() { … } 生下新 G 时，认领自己的 P 的本地队列已满，会将其（以及一部分当前 P 的本地队列 G）推入全局 G 队列等待认领。<br>全局就绪 G 队列被消费的时机：某个 M 空闲下来，且有一个 P 的本地队列也空了，两人一拍即合，P 领取全局队列中（一部分）的 G，而 M 认领 P 并开始执行它的本地队列。</p><p>全局空闲 M 队列被推入的时机：一个 M 发现认领的 P 本地队列已空，且没有无主的 P 在全局 P 队列，因此自旋或挂起自己，放入全局 M 队列。<br>全局空闲 M 队列被消费的时机：当一个 P 被解绑后，尝试找到一个空闲的 M 来继续执行。<code>不过，这个 P “尝试找” 这段代码，本身还是在原本的 M 上执行的。</code></p><h3 id="G-阻塞操作主导的调度细节"><a href="#G-阻塞操作主导的调度细节" class="headerlink" title="G 阻塞操作主导的调度细节"></a>G 阻塞操作主导的调度细节</h3><p>以发生阻塞调用（网络 IO、系统调用），进而需要调度的场景来说明：</p><p>M1 在运行从 P1 中取出的 G1，结果 G1 中某一步调用了阻塞调用，由于 Go 对于这些函数的入口和出口有特殊标记（某个调度函数的代码段），因此在调用开始前 Go Runtime 就会知道要开始调度了。</p><p>考虑到如下前提条件：</p><p>① 即使是阻塞调用，既然是一个语句就必须让一个 thread 运行&#x2F;等待它，所以 M1 必然会被 G1 阻塞住，M1 也只能被阻塞在这里。</p><p>② 但是我们不可以让 P1 这个队列中剩下的其他 G （如果有）就干等 M1 什么时候空闲下来以执行它们。所以最好是让 P1 中的其他 G 可以被分配到其他空闲的 thread，也就是 M 上去执行。</p><p>因此，调度程序就会做如下操作：</p><p>① 原本 P1 被标记为被 M1 认领了在进行消费，现在修改为无主的（idle 状态）。这个就是所谓的 “解绑”，实际上只是修改了一些标记位。</p><p>② 查找是否有空闲的其他 M（处于 idle 挂起状态或者 spinning 等待状态），</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>编程语言</tag>
+      
+      <tag>异步调度</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>关于 channel:messages 列表的缓存操作优化</title>
     <link href="/2025/10/15/%E5%85%B3%E4%BA%8E-channel-messages-%E5%88%97%E8%A1%A8%E7%9A%84%E7%BC%93%E5%AD%98%E6%93%8D%E4%BD%9C%E4%BC%98%E5%8C%96/"/>
     <url>/2025/10/15/%E5%85%B3%E4%BA%8E-channel-messages-%E5%88%97%E8%A1%A8%E7%9A%84%E7%BC%93%E5%AD%98%E6%93%8D%E4%BD%9C%E4%BC%98%E5%8C%96/</url>
     
-    <content type="html"><![CDATA[<h2 id="缓存失效的几种情况"><a href="#缓存失效的几种情况" class="headerlink" title="缓存失效的几种情况"></a>缓存失效的几种情况</h2><ul><li>内存淘汰：由于内存占用过大，自动淘汰。</li><li>超时淘汰：由于 key 达到了 expiration 时间点，自动淘汰。</li><li>“数据库” 数据更新：value 与数据库值不一致。</li></ul><h2 id="缓存失效时可采用的主动操作"><a href="#缓存失效时可采用的主动操作" class="headerlink" title="缓存失效时可采用的主动操作"></a>缓存失效时可采用的主动操作</h2><ul><li>Cache aside：业务层先修改数据库，后修改缓存。</li><li>RW through：业务层均读写于缓存，缓存层自动同步数据库。</li><li>Write behind：业务层均读写于缓存，随后由缓存层异步修改数据库。</li></ul>]]></content>
+    <content type="html"><![CDATA[<h2 id="一、缓存失效的原因"><a href="#一、缓存失效的原因" class="headerlink" title="一、缓存失效的原因"></a>一、缓存失效的原因</h2><ul><li>内存淘汰：由于内存占用过大，自动淘汰。</li><li>超时淘汰：由于 key 达到了 TTL 时间点，自动淘汰。</li><li>DB 数据更新：cache 与 DB 值不一致。</li></ul><h2 id="二、缓存重建时可采用的方案"><a href="#二、缓存重建时可采用的方案" class="headerlink" title="二、缓存重建时可采用的方案"></a>二、缓存重建时可采用的方案</h2><ul><li>Cache Aside：业务层先修改数据库，后顺手修改缓存。</li><li>Write Through：业务层均读写于缓存，缓存层自动同步数据库。</li><li>Write-behind：业务层均读写于缓存，随后由缓存层异步修改数据库。</li></ul><h2 id="三、几种缓存失效问题"><a href="#三、几种缓存失效问题" class="headerlink" title="三、几种缓存失效问题"></a>三、几种缓存失效问题</h2><ul><li><p>Cache Penetration：<strong>一个 key</strong> 不存在于 DB，导致无效请求反复抵达 DB。</p></li><li><p>Cache Breakdown：<strong>一个热点 key</strong> 突然过期，导致大量请求在缓存重建之前全部抵达 DB。</p></li><li><p>Cache Avalanche：<strong>多个 key</strong> 突然过期，导致导致大量请求在缓存重建之前全部抵达 DB。</p></li></ul><h3 id="3-1-Cache-Penetration-解决方案"><a href="#3-1-Cache-Penetration-解决方案" class="headerlink" title="3.1 Cache Penetration 解决方案"></a>3.1 Cache Penetration 解决方案</h3><p>没有好的解决方案，即使使用 bloom filter，也不能完全杜绝。</p><p>只能加强前端和业务层的一些格式检查等。</p><h3 id="3-2-Cache-Breakdown-解决方案"><a href="#3-2-Cache-Breakdown-解决方案" class="headerlink" title="3.2 Cache Breakdown 解决方案"></a>3.2 Cache Breakdown 解决方案</h3><h4 id="3-2-1-简单分布式锁"><a href="#3-2-1-简单分布式锁" class="headerlink" title="3.2.1 简单分布式锁"></a>3.2.1 简单分布式锁</h4><h5 id="3-2-1-1-实现方法"><a href="#3-2-1-1-实现方法" class="headerlink" title="3.2.1-1 实现方法"></a>3.2.1-1 实现方法</h5><p>当某个线程发现缓存失效时，使用 SET NX 尝试获取 Redis 中对应的 modify lock。</p><p>如果获取成功，则查询 DB，用 DB 数据重建缓存并返回，释放 modify lock。<br>如果获取失败，则指数退避尝试若干次 cache，在期限内获取到则返回 cache 数据，否则返回 503。<code>当然，也可以多次失败强行读取 DB，但是如果这样，本质上并没有保护好 DB，如果 cache 长时间都未重建，可能本身就是 DB 超载。</code></p><h5 id="3-2-1-1-优劣"><a href="#3-2-1-1-优劣" class="headerlink" title="3.2.1-1 优劣"></a>3.2.1-1 优劣</h5><p>优势：</p><ul><li>强一致性</li><li>value 内存消耗更小</li><li>动态适应性更好</li></ul><p>劣势：</p><ul><li>死锁、锁重入问题</li><li>大量请求超时可能</li></ul><h3 id="3-2-2-分布式锁-逻辑过期"><a href="#3-2-2-分布式锁-逻辑过期" class="headerlink" title="3.2.2 分布式锁 + 逻辑过期"></a>3.2.2 分布式锁 + 逻辑过期</h3><h4 id="3-2-2-1-实现方法"><a href="#3-2-2-1-实现方法" class="headerlink" title="3.2.2-1 实现方法"></a>3.2.2-1 实现方法</h4><p>修改前提：不设置 key 的 TTL，而是在 value 中存储 exp 字段。</p><p>当某个线程获取到 key，并且发现 exp 已经过期，则使用 SET NX 尝试获取 Redis 中对应的 modify lock。</p><p>如果获取成功，则单独开启一个协程进行 cache rebuild，随后立刻返回过期的 cahce 数据。<br>如果获取失败，立刻返回过期 cache 数据</p><h4 id="3-2-2-2-优劣"><a href="#3-2-2-2-优劣" class="headerlink" title="3.2.2-2 优劣"></a>3.2.2-2 优劣</h4><p>优势：</p><ul><li>响应更快</li></ul><p>劣势：</p><ul><li>低一致性</li><li>整体内容消耗显著增多</li></ul><h3 id="Cache-Avalanche-解决方案"><a href="#Cache-Avalanche-解决方案" class="headerlink" title="Cache Avalanche 解决方案"></a>Cache Avalanche 解决方案</h3><p>其核心问题在于 <strong>多个</strong> key 的过期时间集中在相近的时间内了，因此完全可以给这一系列的 key 的 TTL 设置为基准 TTL ± offset，其中 offset 是一个随机的振幅时间。</p><p>此外，也可以使用如下针对 <strong>单 key</strong> 有效的应对方法：</p><ul><li>使用 local cache 来防止服务全线崩溃</li><li>利用 cache breakdown 中的 logical expiration，使用旧数据进行返回</li></ul>]]></content>
     
     
     
@@ -31,7 +52,7 @@
     <link href="/2025/10/15/%E4%B8%80%E7%A7%8D%E9%92%88%E5%AF%B9%E5%88%86%E5%B8%83%E5%BC%8F-Chat-Server-%E6%A8%AA%E5%90%91%E6%89%A9%E5%B1%95%E7%9A%84%E5%8F%AF%E8%83%BD%E6%80%9D%E8%B7%AF/"/>
     <url>/2025/10/15/%E4%B8%80%E7%A7%8D%E9%92%88%E5%AF%B9%E5%88%86%E5%B8%83%E5%BC%8F-Chat-Server-%E6%A8%AA%E5%90%91%E6%89%A9%E5%B1%95%E7%9A%84%E5%8F%AF%E8%83%BD%E6%80%9D%E8%B7%AF/</url>
     
-    <content type="html"><![CDATA[<h2 id="横向扩展出发点"><a href="#横向扩展出发点" class="headerlink" title="横向扩展出发点"></a>横向扩展出发点</h2><p>在可以横向简单扩展的架构中，最重要的是将 session state 从要扩展的服务器中摘除，或者至少公开到可以快速查询的基建服务上，比如 Redis 节点上。<br>在此基础上，才可以允许 user 无论被负载均衡到哪一个实例上，都是等价的。</p>]]></content>
+    <content type="html"><![CDATA[<h2 id="水平扩展出发点"><a href="#水平扩展出发点" class="headerlink" title="水平扩展出发点"></a>水平扩展出发点</h2><p>在可以横向简单扩展的架构中，最重要的是将 state 从要扩展的服务器中摘除，或者至少公开到可以快速查询的基建服务上，比如 Redis 节点上。<br>在此基础上，才可以允许 user 无论被负载均衡到哪一个实例上，都是等价的。</p><p>所以我的设想是，尽量将 state 转存到用户、Redis 外部节点上，让有需要的业务服务器自行查询指定 state。<br>这样，所有的服务器就可以是无状态的，只需要向注册中心注册，即可完成动态扩缩容和容灾调整。</p><h2 id="简单流程图示"><a href="#简单流程图示" class="headerlink" title="简单流程图示"></a>简单流程图示</h2><p>数据流向图如下：</p><pre><code class=" mermaid">graph BT;    X[Client]    X &lt;--&gt; |长连接| A    subgraph Servers        subgraph Infrastructure            F[Redis]            H[MQ]        end        subgraph DataPersistence            C[Persistence]            E[Database]            C --&gt; |异步批量写 msg| E        end        subgraph Business            A[Connector]            B[Hanlder]            D[Dispatcher]            A &lt;--&gt; |RPC 长连接转发| B            E --&gt; |拉取 DB 数据| B            F --&gt; |拉取 Cache 数据| B            B --&gt; |推送 msg| H            H --&gt; |拉取 msg| C            H --&gt; |拉取 msg| D            D --&gt; |派发 msg 到指定 connector| A        end    end    linkStyle 0 stroke:#ff00ff,stroke-width:2px;    linkStyle 2 stroke:#ff00ff,stroke-width:2px;    linkStyle 5 stroke:#ff00ff,stroke-width:2px;    linkStyle 7 stroke:#ff00ff,stroke-width:2px;    linkStyle 8 stroke:#ff00ff,stroke-width:2px;</code></pre><p>状态存储与读取图如下：</p><pre><code class=" mermaid">graph BT;    subgraph Servers        subgraph Infrastructure            F[Redis]            H[MQ]            G[Registry]        end        subgraph DataPersistence            C[Persistence]            C --&gt; |加入 pers CG| H            G --&gt; |拉取 db| C        end        subgraph Business            A[Connector]            B[Hanlder]            D[Dispatcher]            A --&gt; |注册 user -&gt; connector| F            G --&gt; |拉取 handler| A            B --&gt; |注册 handler| G            B --&gt; |加入 handler PG| H            D --&gt; |加入 disp CG| H            F --&gt; |拉取 connector| D        end    end</code></pre><h2 id="状态分布分析"><a href="#状态分布分析" class="headerlink" title="状态分布分析"></a>状态分布分析</h2><p>与 user session 相关的全局状态只有一个，就是 online_user 的信息，它会以 online:user_id -&gt; gateway_addr 的方式存储于 Redis 当中。<code>这是在</code></p><p>在以上流程中，除 Connector 外所有的业务服务器（即 Infrastructure 和 DataPersistence 以外的服务器），均不持有共享状态。</p><h3 id="Connector-的状态"><a href="#Connector-的状态" class="headerlink" title="Connector 的状态"></a>Connector 的状态</h3><p>本质上 Connector 服务器的状态，是 Redis 中 online_users 状态的一部分，也即 Redis 是全局的 Connector 多实例状态的拷贝。</p><p>Connector 与 Redis 间状态的同步，可以通过带短过期时间的 key + 心跳机制实现。</p><ul><li>key 过期删除</li></ul><p>这是安全的，因为没有续约的 key 代表着用户已经超时未上线，删除其在线状态是合理的。</p><ul><li>key 更新</li></ul><p>在不限制用户单点登录的情况下，这是不安全的。但是考虑到用户的在线状态是记录在 Redis 中的，因此可以有两种选择：</p><p>① 禁止在线后新的异地上线。<br>② 新上线会顶替旧上线，但是这需要 Connector 也读取&#x2F;监听 Redis 中的全局在线状态，实现稍麻烦。</p><p>只要实现了单点登录，更新就只会发生在一个用户重新连接的情况下，这种情景是安全的。<code>不过，这需要 Connector 在一个用户断开连接时，立刻清理 local state 和 Redis state 中的 online_user，防止一个用户因为网络连接不稳，在 Redis state 还未过期时就重新连接，导致强制假掉线。（NOTICE：这似乎无法实现完美的一致性，即一断开就立刻完成 Redis 删除。）</code></p>]]></content>
     
     
     
@@ -96,7 +117,7 @@
       
       <tag>备忘</tag>
       
-      <tag>系统级</tag>
+      <tag>操作系统</tag>
       
     </tags>
     
