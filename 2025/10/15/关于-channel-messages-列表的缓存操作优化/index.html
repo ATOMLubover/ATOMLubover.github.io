@@ -21,15 +21,15 @@
   <meta name="author" content="Hatsu1ki-LB">
   <meta name="keywords" content="">
   
-    <meta name="description" content="一、缓存失效的原因 内存淘汰：由于内存占用过大，自动淘汰。 超时淘汰：由于 key 达到了 TTL 时间点，自动淘汰。 DB 数据更新：cache 与 DB 值不一致。  二、缓存重建时可采用的方案 Cache Aside：业务层先修改数据库，后顺手修改缓存。 Write Through：业务层均读写于缓存，缓存层自动同步数据库。 Write-behind：业务层均读写于缓存，随后由缓存层异步修改">
+    <meta name="description" content="一、缓存失效的原因 内存淘汰：由于内存占用过大，自动淘汰。 超时淘汰：由于 key 达到了 TTL 时间点，自动淘汰。 DB 数据更新：cache 与 DB 值不一致。  二、缓存重建时可采用的 主动 操作2.1 可能的方案 Cache Aside：业务层负责修改数据库，以及修改缓存。 Write Through：业务层均读写于缓存层，缓存层自动同步数据库。 Write-behind：业务层均读写">
 <meta property="og:type" content="article">
 <meta property="og:title" content="关于 channel:messages 列表的缓存操作优化">
 <meta property="og:url" content="http://example.com/2025/10/15/%E5%85%B3%E4%BA%8E-channel-messages-%E5%88%97%E8%A1%A8%E7%9A%84%E7%BC%93%E5%AD%98%E6%93%8D%E4%BD%9C%E4%BC%98%E5%8C%96/index.html">
 <meta property="og:site_name" content="Hatsu1ki Blog">
-<meta property="og:description" content="一、缓存失效的原因 内存淘汰：由于内存占用过大，自动淘汰。 超时淘汰：由于 key 达到了 TTL 时间点，自动淘汰。 DB 数据更新：cache 与 DB 值不一致。  二、缓存重建时可采用的方案 Cache Aside：业务层先修改数据库，后顺手修改缓存。 Write Through：业务层均读写于缓存，缓存层自动同步数据库。 Write-behind：业务层均读写于缓存，随后由缓存层异步修改">
+<meta property="og:description" content="一、缓存失效的原因 内存淘汰：由于内存占用过大，自动淘汰。 超时淘汰：由于 key 达到了 TTL 时间点，自动淘汰。 DB 数据更新：cache 与 DB 值不一致。  二、缓存重建时可采用的 主动 操作2.1 可能的方案 Cache Aside：业务层负责修改数据库，以及修改缓存。 Write Through：业务层均读写于缓存层，缓存层自动同步数据库。 Write-behind：业务层均读写">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-10-15T08:47:36.000Z">
-<meta property="article:modified_time" content="2025-10-16T08:39:25.761Z">
+<meta property="article:modified_time" content="2025-10-18T08:54:43.669Z">
 <meta property="article:author" content="Hatsu1ki-LB">
 <meta property="article:tag" content="后端">
 <meta property="article:tag" content="备忘">
@@ -227,7 +227,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          694 字
+          841 字
         
       </span>
     
@@ -238,7 +238,7 @@
         
         
         
-          6 分钟
+          8 分钟
         
       </span>
     
@@ -285,12 +285,17 @@
 <li>超时淘汰：由于 key 达到了 TTL 时间点，自动淘汰。</li>
 <li>DB 数据更新：cache 与 DB 值不一致。</li>
 </ul>
-<h2 id="二、缓存重建时可采用的方案"><a href="#二、缓存重建时可采用的方案" class="headerlink" title="二、缓存重建时可采用的方案"></a>二、缓存重建时可采用的方案</h2><ul>
-<li>Cache Aside：业务层先修改数据库，后顺手修改缓存。</li>
-<li>Write Through：业务层均读写于缓存，缓存层自动同步数据库。</li>
-<li>Write-behind：业务层均读写于缓存，随后由缓存层异步修改数据库。</li>
+<h2 id="二、缓存重建时可采用的-主动-操作"><a href="#二、缓存重建时可采用的-主动-操作" class="headerlink" title="二、缓存重建时可采用的 主动 操作"></a>二、缓存重建时可采用的 <strong>主动</strong> 操作</h2><h3 id="2-1-可能的方案"><a href="#2-1-可能的方案" class="headerlink" title="2.1 可能的方案"></a>2.1 可能的方案</h3><ul>
+<li>Cache Aside：业务层负责修改数据库，以及修改缓存。</li>
+<li>Write Through：业务层均读写于缓存层，缓存层自动同步数据库。</li>
+<li>Write-behind：业务层均读写于缓层存，随后由业务层&#x2F;缓存层异步修改数据库。</li>
 </ul>
-<h2 id="三、几种缓存失效问题"><a href="#三、几种缓存失效问题" class="headerlink" title="三、几种缓存失效问题"></a>三、几种缓存失效问题</h2><ul>
+<h3 id="2-2-业务层面临的-Cache-Aside-的问题"><a href="#2-2-业务层面临的-Cache-Aside-的问题" class="headerlink" title="2.2 业务层面临的 Cache Aside 的问题"></a>2.2 业务层面临的 Cache Aside 的问题</h3><ul>
+<li>更新还是删除</li>
+<li>先操作数据库，还是先操作缓存</li>
+<li>原子性的事务性保证</li>
+</ul>
+<h2 id="三、需要处理的缓存失效问题"><a href="#三、需要处理的缓存失效问题" class="headerlink" title="三、需要处理的缓存失效问题"></a>三、需要处理的缓存失效问题</h2><ul>
 <li><p>Cache Penetration：<strong>一个 key</strong> 不存在于 DB，导致无效请求反复抵达 DB。</p>
 </li>
 <li><p>Cache Breakdown：<strong>一个热点 key</strong> 突然过期，导致大量请求在缓存重建之前全部抵达 DB。</p>
@@ -298,9 +303,18 @@
 <li><p>Cache Avalanche：<strong>多个 key</strong> 突然过期，导致导致大量请求在缓存重建之前全部抵达 DB。</p>
 </li>
 </ul>
-<h3 id="3-1-Cache-Penetration-解决方案"><a href="#3-1-Cache-Penetration-解决方案" class="headerlink" title="3.1 Cache Penetration 解决方案"></a>3.1 Cache Penetration 解决方案</h3><p>没有好的解决方案，即使使用 bloom filter，也不能完全杜绝。</p>
-<p>只能加强前端和业务层的一些格式检查等。</p>
-<h3 id="3-2-Cache-Breakdown-解决方案"><a href="#3-2-Cache-Breakdown-解决方案" class="headerlink" title="3.2 Cache Breakdown 解决方案"></a>3.2 Cache Breakdown 解决方案</h3><h4 id="3-2-1-简单分布式锁"><a href="#3-2-1-简单分布式锁" class="headerlink" title="3.2.1 简单分布式锁"></a>3.2.1 简单分布式锁</h4><h5 id="3-2-1-1-实现方法"><a href="#3-2-1-1-实现方法" class="headerlink" title="3.2.1-1 实现方法"></a>3.2.1-1 实现方法</h5><p>当某个线程发现缓存失效时，使用 SET NX 尝试获取 Redis 中对应的 modify lock。</p>
+<h3 id="3-1-Cache-Penetration-解决方案"><a href="#3-1-Cache-Penetration-解决方案" class="headerlink" title="3.1 Cache Penetration 解决方案"></a>3.1 Cache Penetration 解决方案</h3><ul>
+<li>设置对应 key 的空值（带短 TTL）</li>
+</ul>
+<p>可以有效防止短时间内的大量请求进入数据库。</p>
+<p>浪费 Redis 空间，但是仍然可控。</p>
+<ul>
+<li>Bloom Filter</li>
+</ul>
+<p>业务层直接拦截，更加高效，且适合分布式。</p>
+<p>但是需要处理新 key 产生后的一致性。<br>且假如恰好一直访问一个 false positive 的值，仍然无法防护。</p>
+<h3 id="3-2-Cache-Breakdown-解决方案"><a href="#3-2-Cache-Breakdown-解决方案" class="headerlink" title="3.2 Cache Breakdown 解决方案"></a>3.2 Cache Breakdown 解决方案</h3><p>为了减少数据库压力，必然需要使用 singleflight，但是具体到阻塞时的操作，仍然有两种选择。</p>
+<h4 id="3-2-1-简单分布式锁"><a href="#3-2-1-简单分布式锁" class="headerlink" title="3.2.1 简单分布式锁"></a>3.2.1 简单分布式锁</h4><h5 id="3-2-1-1-实现方法"><a href="#3-2-1-1-实现方法" class="headerlink" title="3.2.1-1 实现方法"></a>3.2.1-1 实现方法</h5><p>当某个线程发现缓存失效时，使用 SET NX 尝试获取 Redis 中对应的 modify lock。</p>
 <p>如果获取成功，则查询 DB，用 DB 数据重建缓存并返回，释放 modify lock。<br>如果获取失败，则指数退避尝试若干次 cache，在期限内获取到则返回 cache 数据，否则返回 503。<code>当然，也可以多次失败强行读取 DB，但是如果这样，本质上并没有保护好 DB，如果 cache 长时间都未重建，可能本身就是 DB 超载。</code></p>
 <h5 id="3-2-1-1-优劣"><a href="#3-2-1-1-优劣" class="headerlink" title="3.2.1-1 优劣"></a>3.2.1-1 优劣</h5><p>优势：</p>
 <ul>

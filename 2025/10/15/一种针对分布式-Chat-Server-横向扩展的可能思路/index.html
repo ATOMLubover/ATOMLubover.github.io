@@ -29,7 +29,7 @@
 <meta property="og:description" content="水平扩展出发点在可以横向简单扩展的架构中，最重要的是将 state 从要扩展的服务器中摘除，或者至少公开到可以快速查询的基建服务上，比如 Redis 节点上。在此基础上，才可以允许 user 无论被负载均衡到哪一个实例上，都是等价的。 所以我的设想是，尽量将 state 转存到用户、Redis 外部节点上，让有需要的业务服务器自行查询指定 state。这样，所有的服务器就可以是无状态的，只需要向注">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-10-15T02:50:32.000Z">
-<meta property="article:modified_time" content="2025-10-16T10:55:23.969Z">
+<meta property="article:modified_time" content="2025-10-17T12:33:41.305Z">
 <meta property="article:author" content="Hatsu1ki-LB">
 <meta property="article:tag" content="后端">
 <meta property="article:tag" content="备忘">
@@ -227,7 +227,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          752 字
+          790 字
         
       </span>
     
@@ -375,6 +375,7 @@
 <p>在不限制用户单点登录的情况下，这是不安全的。但是考虑到用户的在线状态是记录在 Redis 中的，因此可以有两种选择：</p>
 <p>① 禁止在线后新的异地上线。<br>② 新上线会顶替旧上线，但是这需要 Connector 也读取&#x2F;监听 Redis 中的全局在线状态，实现稍麻烦。</p>
 <p>只要实现了单点登录，更新就只会发生在一个用户重新连接的情况下，这种情景是安全的。<code>不过，这需要 Connector 在一个用户断开连接时，立刻清理 local state 和 Redis state 中的 online_user，防止一个用户因为网络连接不稳，在 Redis state 还未过期时就重新连接，导致强制假掉线。（NOTICE：这似乎无法实现完美的一致性，即一断开就立刻完成 Redis 删除。）</code></p>
+<h3 id="Handler-的状态"><a href="#Handler-的状态" class="headerlink" title="Handler 的状态"></a>Handler 的状态</h3><p>Handler 是业务微服务器的统称，在这个最简化的 IM 系统中，它应该分为 User Service、Channel Service 以及最重要的 Message Service。</p>
 
                 
               </div>
