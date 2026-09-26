@@ -1,0 +1,22 @@
+name: Code quality
+
+on:
+  push:
+    branches: [ main ] # Adjust branches as needed
+  pull_request:
+    branches: [ main ] # Adjust branches as needed
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.6
+      - name: Install dependencies
+        run: deno install --frozen --allow-scripts=npm:esbuild,npm:sharp
+      - name: Run Biome
+        run: deno task lint
