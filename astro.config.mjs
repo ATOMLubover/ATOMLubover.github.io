@@ -29,6 +29,9 @@ export default defineConfig({
 	site: "https://atomlubover.github.io/",
 	base: "/",
 	trailingSlash: "always",
+	redirects: {
+		"/posts/优雅处理事务注入的依赖注入范式/": "/posts/优雅处理事务上下文注入的设计范式/",
+	},
 	integrations: [
 		tailwind({
 			nesting: true,
