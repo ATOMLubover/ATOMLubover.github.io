@@ -27,20 +27,11 @@ Un tema estático para blogs construido con [Astro](https://astro.build).
 Inicializa el proyecto localmente usando [create-fuwari](https://github.com/L4Ph/create-fuwari).
 
 ```sh
-# npm
 npm create fuwari@latest.
-
-# yarn
 yarn create fuwari.
 
 # pnpm
-pnpm create fuwari@latest
-
-# bun
-bun create fuwari@latest
-
-# deno
-deno run -A npm:create-fuwari@latest
+pnpm dlx create-fuwari@latest
 ```
 
 1. Edita el archivo de configuración `src/config.ts` para personalizar tu blog.
@@ -51,7 +42,7 @@ deno run -A npm:create-fuwari@latest
 
 1. [Genera un nuevo repositorio](https://github.com/saicaca/fuwari/generate) desde esta plantilla o haz un fork de este repositorio.
 2. Para editar tu blog localmente, clona tu repositorio, ejecuta `pnpm install` y `pnpm add sharp` para instalar las dependencias.
-   - Instala [pnpm](https://pnpm.io) `npm install -g pnpm` si aún no lo tienes.
+   - Instala [pnpm](https://pnpm.io) `standalone pnpm: https://pnpm.io/installation#using-a-standalone-script` si aún no lo tienes.
 3. Edita el archivo de configuración `src/config.ts` para personalizar tu blog.
 4. Ejecuta `pnpm new-post <nombre-de-archivo>` para crear una nueva entrada y edítala en `src/content/posts/`.
 5. Despliega tu blog en Vercel, Netlify, GitHub Pages, etc., siguiendo [las guías](https://docs.astro.build/en/guides/deploy/). Necesitas editar la configuración del sitio en `astro.config.mjs` antes del despliegue.

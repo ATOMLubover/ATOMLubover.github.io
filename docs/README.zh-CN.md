@@ -27,20 +27,9 @@
 使用 [create-fuwari](https://github.com/L4Ph/create-fuwari) 在本地初始化项目。
 
 ```sh
-# npm
-npm create fuwari@latest
-
-# yarn
-yarn create fuwari
 
 # pnpm
-pnpm create fuwari@latest
-
-# bun
-bun create fuwari@latest
-
-# deno
-deno run -A npm:create-fuwari@latest
+pnpm dlx create-fuwari@latest
 ```
 
 1. 通过配置文件 `src/config.ts` 自定义博客
@@ -51,7 +40,7 @@ deno run -A npm:create-fuwari@latest
 
 1. 使用此模板[生成新仓库](https://github.com/saicaca/fuwari/generate)或 Fork 此仓库
 2. 进行本地开发，Clone 新的仓库，执行 `pnpm install` 和 `pnpm add sharp` 以安装依赖  
-   - 若未安装 [pnpm](https://pnpm.io)，执行 `npm install -g pnpm`
+   - 若未安装 [pnpm](https://pnpm.io)，执行 `standalone pnpm: https://pnpm.io/installation#using-a-standalone-script`
 3. 通过配置文件 `src/config.ts` 自定义博客
 4. 执行 `pnpm new-post <filename>` 创建新文章，并在 `src/content/posts/` 目录中编辑
 5. 参考[官方指南](https://docs.astro.build/zh-cn/guides/deploy/)将博客部署至 Vercel, Netlify, GitHub Pages 等；部署前需编辑 `astro.config.mjs` 中的站点设置。

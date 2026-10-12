@@ -23,14 +23,10 @@
    - 이 템플릿에서 [새 저장소를 생성](https://github.com/saicaca/fuwari/generate)하거나 이 저장소를 포크하세요.
    - 또는 다음 명령어 중 하나를 실행하세요:
    ```sh
-       npm create fuwari@latest
-       yarn create fuwari
-       pnpm create fuwari@latest
-       bun create fuwari@latest
-       deno run -A npm:create-fuwari@latest
+       pnpm dlx create-fuwari@latest
    ```
 2. 로컬에서 블로그를 수정하려면, 저장소를 복제하고 `pnpm install`을 실행하여 종속성을 설치하세요.
-   - [pnpm](https://pnpm.io)이 설치되어 있지 않다면 `npm install -g pnpm`을 실행하여 설치하세요.
+   - [pnpm](https://pnpm.io)이 설치되어 있지 않다면 `standalone pnpm: https://pnpm.io/installation#using-a-standalone-script`을 실행하여 설치하세요.
 3. `src/config.ts`설정 파일을 수정하여 블로그를 커스터마이징하세요.
 4. `pnpm new-post <filename>`을 실행하여 새 게시물을 만들고 `src/content/posts/`에서 수정하세요.
 5. [가이드](https://docs.astro.build/en/guides/deploy/)에 따라 블로그를 Vercel, Netlify, Github Pages 등에 배포하세요. 배포하기 전에 `astro.config.mjs`에서 사이트 구성을 수정해야 합니다.
@@ -67,7 +63,7 @@ Astro의 기본 [GitHub Flavored Markdown](https://github.github.com/gfm/) 지�
 | `pnpm dev`                          | `localhost:4321`에서 로컬 개발 서버를 시작합니다.      |
 | `pnpm build`                        | `./dist/`에 프로덕션 사이트를 구축합니다.         |
 | `pnpm check`                        | 코드에서 오류를 확인합니다.         |
-| `pnpm format`                        | Biome을 사용하여 코드를 포멧합니다.         |
+| `pnpm format`                        | Prettier을 사용하여 코드를 포멧합니다.         |
 | `pnpm preview`                      | 배포하기 전에 로컬에서 빌드 미리보기     |
 | `pnpm new-post <filename>`          | 새 게시물 작성                                |
 | `pnpm astro ...`                    | `astro add`, `astro check`와 같은 CLI 명령어 실행 |

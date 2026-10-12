@@ -1,0 +1,8 @@
+allowBuilds:
+  esbuild: true
+  sharp: true
+  playwright-chromium: false
+# UnoCSS directive expansion duplicates inserted CSS with magic-string 1.4.3.
+# https://github.com/unocss/unocss/issues/5373
+overrides:
+  "@unocss/vite>magic-string": 1.4.2

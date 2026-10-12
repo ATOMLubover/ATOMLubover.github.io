@@ -1,14 +1,14 @@
 # Personal Blog
 
-基于 [Fuwari](https://github.com/saicaca/fuwari) 的 Astro 静态博客，使用 Deno 管理依赖和运行任务。
+基于 [Fuwari](https://github.com/saicaca/fuwari) 的 Astro 静态博客，使用 pnpm 管理依赖、Node.js 26 运行任务。
 
 ## 开发
 
-需要 Deno 2.9.6，以及运行快捷命令用的 just。
+需要 Node.js 26.11.1 和 pnpm 12.11.2，以及运行快捷命令用的 just。
 
 ```sh
-deno install --frozen --allow-scripts=npm:esbuild,npm:sharp
-deno task dev
+pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
 开发地址：<http://localhost:4321>。
@@ -16,15 +16,15 @@ deno task dev
 ## 常用命令
 
 ```sh
-deno task check             # Astro 类型检查
-deno task build             # 构建站点并生成 Pagefind 搜索索引
-deno task preview           # 预览 dist 中的构建产物
-deno task new-post my-post  # 创建文章
-deno task format            # 格式化源码
-deno task lint              # 检查源码规范
+pnpm run check             # Astro 类型检查
+pnpm run build             # 构建站点并生成 Pagefind 搜索索引
+pnpm run preview           # 预览 dist 中的构建产物
+pnpm run new-post my-post  # 创建文章
+pnpm run format            # 格式化源码
+pnpm run lint              # 检查源码规范
 ```
 
-依赖声明在 `package.json`，锁定在 `deno.lock`，任务定义在 `deno.json`。所有任务均由 Deno 执行。
+依赖声明在 `package.json`，锁定在 `pnpm-lock.yaml`，任务定义在 `package.json`。所有任务均通过 pnpm 调用项目本地工具。
 
 ## 部署
 
@@ -46,14 +46,16 @@ just deploy
 
 ## 配置和内容
 
+文章配套演示：[事务上下文注入 · Slidev 解说幻灯片](slides/transaction-context/README.md)，包含 18 页幻灯片和逐页讲稿。
+
 - `src/config.ts`：站点标题、语言、头像、导航和主题。
 - `astro.config.mjs`：正式站点地址和路径前缀，当前部署在根路径。
 - `src/content/posts/`：Markdown 文章，当前包含模板示例。
 - `src/content/spec/about.md`：关于页面。
 - `public/`：静态资源。
 
-当前保留 Fuwari 示例配置和内容。模板功能说明见 [中文文档](docs/README.zh-CN.md)；其中的 pnpm 命令请使用上述 Deno 命令替代。
+当前保留 Fuwari 示例配置和内容。模板功能说明见 [中文文档](docs/README.zh-CN.md)；其中的 pnpm 命令请使用上述 pnpm 命令替代。
 
-构建结果位于 `dist/`，可部署至静态托管服务。GitHub Actions 使用 Deno 执行检查和构建。
+构建结果位于 `dist/`，可部署至静态托管服务。GitHub Actions 使用 Node.js 与 pnpm 执行检查和构建。
 
 Fuwari 采用 MIT 许可，详见 [LICENSE](LICENSE)。

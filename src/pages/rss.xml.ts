@@ -10,7 +10,7 @@ const parser = new MarkdownIt();
 
 function stripInvalidXmlChars(str: string): string {
 	return str.replace(
-		// biome-ignore lint/suspicious/noControlCharactersInRegex: https://www.w3.org/TR/xml/#charsets
+		// eslint-disable-next-line no-control-regex -- Strip characters forbidden by the XML specification.
 		/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\uFDD0-\uFDEF\uFFFE\uFFFF]/g,
 		"",
 	);
