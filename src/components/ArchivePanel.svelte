@@ -86,7 +86,7 @@
 </script>
 
 <div class="card-base px-8 py-6">
-	{#each groups as group (group.year)}
+	{#each groups as group}
 		<div>
 			<div class="flex flex-row w-full items-center h-[3.75rem]">
 				<div
@@ -108,7 +108,7 @@
 				</div>
 			</div>
 
-			{#each group.posts as post (post.id)}
+			{#each group.posts as post}
 				<a
 					href={getPostUrlBySlug(post.slug)}
 					aria-label={post.data.title}

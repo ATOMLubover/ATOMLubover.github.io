@@ -1,11 +1,11 @@
 ---
 title: PopRaKo 的 Unit 同步·其二（幂等保存）
 slug: poprako-unit-sync-idempotent-save
-published: 2026-10-01
+published: 2026-10-02
 description: 介绍 PopRaKo 中 Unit 同步的幂等保存。
 image: ""
 tags: ["PopRaKo", "Rust", "同步"]
-category: "架构设计"
+category: "业务设计"
 draft: true
 lang: zh-CN
 ---

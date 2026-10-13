@@ -5,7 +5,7 @@ published: 2026-10-01
 description: 介绍 PopRaKo 中 Unit 同步时的修改合并。
 image: ""
 tags: ["PopRaKo", "Rust", "同步"]
-category: "架构设计"
+category: "业务设计"
 draft: true
 lang: zh-CN
 ---

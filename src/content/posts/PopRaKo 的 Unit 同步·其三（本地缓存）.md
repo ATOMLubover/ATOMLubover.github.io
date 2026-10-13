@@ -1,11 +1,11 @@
 ---
 title: PopRaKo 的 Unit 同步·其三（本地缓存）
 slug: poprako-unit-sync-local-cache
-published: 2026-10-01
+published: 2026-10-03
 description: 介绍 PopRaKo 的 Unit 同步与本地缓存。
 image: ""
 tags: ["PopRaKo", "Rust", "同步"]
-category: "架构设计"
+category: "业务设计"
 draft: true
 lang: zh-CN
 ---

@@ -24,6 +24,11 @@ export default ts.config(
 		files: ["**/*.svelte"],
 		languageOptions: { parserOptions: { parser: ts.parser } },
 	},
+	// Preserve Fuwari's official unkeyed archive lists.
+	{
+		files: ["src/components/ArchivePanel.svelte"],
+		rules: { "svelte/require-each-key": "off" },
+	},
 	...astro.configs.recommended,
 	// CSS variables are also consumed by Tailwind arbitrary-value classes and scripts.
 	{
