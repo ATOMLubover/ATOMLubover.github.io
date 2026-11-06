@@ -243,7 +243,11 @@ impl Logger {
 
 这个时候，既然我们无法优化单次调用的固有开销，那么工程上我们可以着眼多次调用的平均情况：想办法 **分类讨论**，拆出冷热路径，热路径尽可能降低开销，只让冷路径进行高开销计算。
 
-那么我们该如何让 `format_time` 在热路径下跳过 `current_offset` 这些大开销计算呢？一个常见的方法是，同一秒内的时间戳不重复计算，而是优先使用缓存中的序列化结果。
+那么我们该如何让 `format_time` 在热路径下跳过 `current_offset` 这些大开销计算呢？面对这种计算昂贵的情况，一个常见的方法是，同一秒内的时间戳不重复计算，而是优先使用缓存中的序列化结果。
+
+:::tip
+这种类似的思路可以参考 Rust 标准库的 `sort_with_key` -> `sort_with_cached_key`。
+:::
 
 不过，显然我们不可能缓存整个时间戳对应的完整结果（比如 `2026-11-02 14:05:09.114`），否则每次都会 cache miss。所以我们应该找一个在高频调用时，相对稳定的 **前缀部分**，通常选直到秒的部分（比如 `2026-11-02 14:05:09`）；而后续的毫秒部分则可以正常地转换并序列化，因为其完全不需要处理时区，也就不会有 `current_offset` 的巨大开销。
 
@@ -593,8 +597,8 @@ pub fn log(&self, level: Level, timestamp_millis: u64, message: &str) {
 
     TIME_FORMATTER.with(|formatter| {
         let mut formatter = formatter.borrow_mut();
-        let time_str = formatter.format(timestamp_millis);
-        let formatted_line = Self::format_line(time_str, level, message);
+        let formatted_time = formatter.format(timestamp_millis);
+        let formatted_line = Self::format_line(formatted_time, level, message);
         self._mock_print(&formatted_line);
     });
 }
@@ -639,18 +643,10 @@ fn format_line(formatted_time: &str, level: Level, message: &str) -> String {
 const BUFFER_THRESHOLD: usize = 1 << 7;
 
 // 固定容量缓冲区
+#[derive(Default)]
 pub struct FixedBuffer {
     data: [u8; BUFFER_THRESHOLD],
     len: usize,
-}
-
-impl Default for FixedBuffer {
-    fn default() -> Self {
-        Self {
-            data: [0; BUFFER_THRESHOLD],
-            len: 0,
-        }
-    }
 }
 
 impl FixedBuffer {
@@ -943,6 +939,12 @@ Self::format_line(&mut buffer, &time_buffer, level, message);
 Self::format_line(&mut buffer, &time_buffer, level, arguments)
     .expect("adaptive buffer write cannot fail");
 ```
+
+### `str` 和 `[u8]` 的转换
+
+在上文中，我们为了保证 API 的可读性，大部分地方都有一些 `std::str::from_utf8` 的开销。这其实在日志库中不是完全必要的，我们可以所有地方都使用 `[u8]` 做透明传递，至于其中是否存储的是有效的 UTF-8 字符串可以让 `_mock_print` 的实现者自己去决定，这样 logger 内部就完全没有转换开销了。
+
+之所以不可以直接指定某个字段是 `field: str`，主要是因为 `str` 虽然内部是字节数组，但是它有一个无法直接确定表达在类型上的 “必须是 UTF-8 编码” 的约束。因此它不能事先指定长度（n 个 UTF-8 字符的字节长度是不确定的），也就无法作为我们缓冲区的直接载体。
 
 ## 完整实现
 
