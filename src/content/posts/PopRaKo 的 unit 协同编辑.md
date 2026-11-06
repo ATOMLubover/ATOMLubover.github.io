@@ -2,10 +2,10 @@
 title: PopRaKo 的 unit 协同编辑
 slug: poprako-unit-edit-api-design
 published: 2026-10-01
-description: PopRaKo 服务器中 unit 协同编辑功能开发中的接口层设计。
+description: PopRaKo 服务器中 unit 协同编辑功能开发中的接口/逻辑设计。
 image: ""
 tags: ["PopRaKo", "数据同步"]
-category: "业务"
+category: "业务设计"
 lang: zh-CN
 ---
 
